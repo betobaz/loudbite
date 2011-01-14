@@ -203,6 +203,148 @@ class AccountController extends Zend_Controller_Action
          
          return $form;
      }
+	 /**
+	  * Test our connection
+	  */
+	 public function testConnAction()
+	 {
+	 	try{
+
+			$connParams = array(
+				"host"=>"localhost",
+				"port"=>"3306",
+				"username"=>"loudbite",
+				"password"=>"sFu7sndxDDpXsq4B",
+				"dbname"=>"loudbite"
+			);
+			$db = new Zend_Db_Adapter_Pdo_Mysql($connParams);
+
+		}catch(Zend_Db_Exception $e){
+			echo $e->getMessage();
+		}
+		echo "Database object create.";
+
+		//Turn off View Rendering.
+		$this->_helper->viewRenderer->setNoRender();
+	 }
+	 /**
+	  * Test Insert
+	  */
+	 public function testInsertAction()
+	 {
+	 	try{
+			//Create a DB object
+			require_once "Db/Db_Db.php";
+			$db = Db_Db::conn();
+
+			//DDL for initial 3 users
+			$statement = "INSERT INTO accounts(username,email,password,status,create_date)
+				VALUES('test_1','test@loudbite.com','password','active',NOW())";
+			$statement2 = "INSERT INTO accounts(username,email,password,status,create_date)
+				VALUES('test_2','test2@loudbite.com','password','active',NOW())";
+			$statement3 = "INSERT INTO accounts(username,email,password,status,create_date)
+				VALUES(?,?,?,?,NOW())";
+			//Insert the above statements into the accounts.
+			$db->query($statement);
+			$db->query($statement2);
+
+			//Insert the statement using ? flags.
+			$db->query($statement3,array('test_3','text3@loudbite.com','password','active'));
+
+			//Close Connection
+			$db->closeConnection();
+
+			echo "Completed Inserting";
+
+		}catch(Zend_Db_Exception $e){
+			echo $e->getMessage();
+		}
+
+		//Supress the View
+		$this->_helper->viewRenderer->setNoRender();
+
+	 }
+	 /**
+	  * Test Insert Method
+	  * Insert data into table using insert()
+	  */
+	 public function testInsertMethodAction()
+	 {
+	 	try{
+
+			//Create a DB object
+			require_once "Db/Db_Db.php";
+			$db = Db_Db::conn();
+
+			//Data to save
+			$userData1 = array(
+				"username"=>'test_4',
+				"email"=>'test_4@loudbite.com',
+				"password"=>'password',
+				"status"=>'active',
+				"create_date"=>'0000-00-00 00:00:00'
+			);
+			$userData2 = array(
+				"username"=>'test_5',
+				"email"=>'test_5@loudbite.com',
+				"password"=>'password',
+				"status"=>'active',
+				"create_date"=>'0000-00-00 00:00:00'
+			);
+			$userData3 = array(
+				"username"=>'test_6',
+				"email"=>'test_6@loudbite.com',
+				"password"=>'password',
+				"status"=>'active',
+				"create_date"=>'0000-00-00 00:00:00'
+			);
+			//Insert into the Accounts.
+			$db->insert('accounts',$userData1);
+			$db->insert('accounts',$userData2);
+			$db->insert('accounts',$userData3);
+			
+			//Close Connection
+			$db->closeConnection();
+
+			echo "Completed Inserting";
+		}catch(Zend_Db_Exception $e){
+			echo $e->getMessage();
+		}
+
+		//Supress the View
+		$this->_helper->viewRenderer->setNoRender();
+	 }
+	 /**
+	  * Test Expression
+	  * Using Database Expressions.
+	  */
+	 public function testExpressionAction()
+	 {
+	 	try{
+			//Create a DB object
+			require_once "Db/Db_Db.php";
+			$db = Db_Db::conn();
+
+			$userData = array(
+				"username"=>'test_7',
+				"email"=>'test7@loudbite.com',
+				"password"=>'password',
+				"status"=>'action',
+				"create_date"=> new Zend_Db_Expr("NOW()")
+			);
+			//Insert into the accounts.
+			$db->insert('accounts',$userData);
+			
+			//Close Connection
+			$db->closeConnection();
+			echo "Completed Inserting";
+
+		}catch(Zend_Db_Exception $e){
+			echo $e->getMessage();
+		}
+		//Supress the View
+		$this->_helper->viewRenderer->setNoRender();
+	 }
 }
 
 
