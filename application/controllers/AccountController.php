@@ -345,6 +345,75 @@ class AccountController extends Zend_Controller_Action
 		//Supress the View
 		$this->_helper->viewRenderer->setNoRender();
 	 }
+	 /**
+	  *Test Quote
+	  */
+	 public function testQuoteAction()
+	 {
+		try{
+			// Create Db object
+			require_once "Db/Db_Db.php";
+			$db = Db_Db::conn();
+			$username = "testing 'user";
+			$usernameAfterQuote = $db->quote($username);
+
+			echo "BEFORE QUOTE: $username<br>";
+			echo "AFTER QUOTE: $usernameAfterQuote<br>";
+
+			//DDL for initial 3 users
+			echo $statement = "INSERT INTO accounts(
+				username, email, password, status, create_date
+				)
+				VALUES(
+				$usernameAfterQuote, 'test8@loudbite.com','password', 
+				'active',NOW()
+				)";
+			//Insert the above statements into the accounts
+			$db->query($statement);
+
+			//Close Connection
+			$db->closeConnection();
+
+			echo "Successfully inserted";
+		}catch(Zend_Db_Exception $e){
+			echo $e->getMessage();
+		}
+
+		//Supress the View
+		$this->_helper->viewRenderer->setNoRender();
+	 }
+	 /**
+	  * Test Last Insert
+	  */
+	 public function testLastInsertAction()
+	 {
+	 	try{
+			//Create Db  object
+			require_once "Db/Db_Db.php";
+			$db = Db_Db::conn();
+
+			//Data to save
+			$userData = array("username" =>'testinguser9',
+				"email"=>'test9loudbite.com',
+				"password"=>'password',
+				"status" => 'active',
+				"create_date" => new Zend_Db_Expr("NOW()")
+			);
+			$db->insert('accounts', $userData);
+			//Retrieve the id for the new record an echo
+			$id = $db->lastInsertId();
+			echo "Last Inserted Id:".$id."<br>";
+
+			//Close Connection
+			$db->closeConnection();
+			echo "Successfully Inserted Data";
+		}catch(Zend_Db_Exception $e){
+			echo $e->getMessage();
+		}
+
+		//Supress the view.
+		$this->_helper->viewRenderer->setNoRender();
+	 }
 }
 
 
